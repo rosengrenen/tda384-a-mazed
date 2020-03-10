@@ -14,38 +14,33 @@ import java.util.Stack;
 import java.util.Collections;
 
 /**
- * <code>SequentialSolver</code> implements a solver for
- * <code>Maze</code> objects using a single-thread depth-first search.
+ * <code>SequentialSolver</code> implements a solver for <code>Maze</code>
+ * objects using a single-thread depth-first search.
  * <p>
  * Even though <code>SequentialSolver</code> is implemented as a
  * <code>RecursiveTask</code>, it is purely sequential. Method
- * <code>compute</code> returns a solution consisting of a list of
- * node identifiers in the maze that lead from the start node to a
- * goal.
+ * <code>compute</code> returns a solution consisting of a list of node
+ * identifiers in the maze that lead from the start node to a goal.
  * <p>
- * Depth-first search is implemented using a stack of
- * <code>frontier</code> nodes &mdash; giving the nodes to be explored
- * next in depth-first order. Visited nodes are added to a set
- * <code>visited</code>. For each visited node,
- * <code>predecessor</code> keeps track of the other node adjacent to
- * the visited node that has been visited just before it. Method
+ * Depth-first search is implemented using a stack of <code>frontier</code>
+ * nodes &mdash; giving the nodes to be explored next in depth-first order.
+ * Visited nodes are added to a set <code>visited</code>. For each visited node,
+ * <code>predecessor</code> keeps track of the other node adjacent to the
+ * visited node that has been visited just before it. Method
  * <code>pathFromTo</code> reconstructs a path by following the
  * <code>precedessor</code> relation backwards.
  *
- * @author  Carlo A. Furia
+ * @author Carlo A. Furia
  */
 
-public class SequentialSolver
-    extends RecursiveTask<List<Integer>>
-{
+public class SequentialSolver extends RecursiveTask<List<Integer>> {
     /**
-     * Creates a solver that searches in <code>maze</code> from the
-     * start node to a goal.
+     * Creates a solver that searches in <code>maze</code> from the start node to a
+     * goal.
      *
-     * @param maze   the maze to be searched
+     * @param maze the maze to be searched
      */
-    public SequentialSolver(Maze maze)
-    {
+    public SequentialSolver(Maze maze) {
         this.maze = maze;
         this.start = maze.start();
         initStructures();
@@ -53,11 +48,9 @@ public class SequentialSolver
 
     /**
      * Initializes <code>visited</code>, <code>predecessor</code>, and
-     * <code>frontier</code> with empty data structures for sequential
-     * access.
+     * <code>frontier</code> with empty data structures for sequential access.
      */
-    protected void initStructures()
-    {
+    protected void initStructures() {
         visited = new HashSet<>();
         predecessor = new HashMap<>();
         frontier = new Stack<>();
@@ -69,54 +62,46 @@ public class SequentialSolver
     protected Maze maze;
 
     /**
-     * Number of steps (nodes to be visited) before forking. This is
-     * set to <code>0</code> in <code>SequentialSolver</code>, which
-     * means no forking.
+     * Number of steps (nodes to be visited) before forking. This is set to
+     * <code>0</code> in <code>SequentialSolver</code>, which means no forking.
      */
     protected int forkAfter = 0;
 
     /**
-     * Set of identifiers of all nodes visited so far during the
-     * search.
+     * Set of identifiers of all nodes visited so far during the search.
      */
     protected Set<Integer> visited;
     /**
-     * If <code>(m -&gt; n)</code> is in <code>precedessor</code>, then
-     * the node with identifier <code>n</code> has been first visited
-     * from its neighbor node with identifier <code>m</code> during
-     * the search.
+     * If <code>(m -&gt; n)</code> is in <code>precedessor</code>, then the node
+     * with identifier <code>n</code> has been first visited from its neighbor node
+     * with identifier <code>m</code> during the search.
      */
     protected Map<Integer, Integer> predecessor;
     /**
-     * The nodes in the maze to be visited next. Using a stack
-     * implements a search that goes depth first..
+     * The nodes in the maze to be visited next. Using a stack implements a search
+     * that goes depth first..
      */
     protected Stack<Integer> frontier;
     /**
-     * The identifier of the node in the maze from where the search
-     * starts.
+     * The identifier of the node in the maze from where the search starts.
      */
     protected int start;
 
     /**
-     * Searches for and returns the path, as a list of node
-     * identifiers, that goes from the start node to a goal node in
-     * the maze. If such a path cannot be found (because there are no
-     * goals, or all goals are unreacheable), the method returns
-     * <code>null</code>.
+     * Searches for and returns the path, as a list of node identifiers, that goes
+     * from the start node to a goal node in the maze. If such a path cannot be
+     * found (because there are no goals, or all goals are unreacheable), the method
+     * returns <code>null</code>.
      *
-     * @return   the list of node identifiers from the start node to a
-     *           goal node in the maze; <code>null</code> if such a path cannot
-     *           be found
+     * @return the list of node identifiers from the start node to a goal node in
+     *         the maze; <code>null</code> if such a path cannot be found
      */
     @Override
-    public List<Integer> compute()
-    {
+    public List<Integer> compute() {
         return depthFirstSearch();
     }
 
-    private List<Integer> depthFirstSearch()
-    {
+    private List<Integer> depthFirstSearch() {
         // one player active on the maze at start
         int player = maze.newPlayer(start);
         // start with start node
@@ -139,7 +124,7 @@ public class SequentialSolver
                 // mark node as visited
                 visited.add(current);
                 // for every node nb adjacent to current
-                for (int nb: maze.neighbors(current)) {
+                for (int nb : maze.neighbors(current)) {
                     // add nb to the nodes to be processed
                     frontier.push(nb);
                     // if nb has not been already visited,
@@ -154,17 +139,16 @@ public class SequentialSolver
     }
 
     /**
-     * Returns the connected path, as a list of node identifiers, that
-     * goes from node <code>from</code> to node <code>to</code>
-     * following the inverse of relation <code>predecessor</code>. If
-     * such a path cannot be reconstructed from
-     * <code>predecessor</code>, the method returns <code>null</code>.
+     * Returns the connected path, as a list of node identifiers, that goes from
+     * node <code>from</code> to node <code>to</code> following the inverse of
+     * relation <code>predecessor</code>. If such a path cannot be reconstructed
+     * from <code>predecessor</code>, the method returns <code>null</code>.
      *
-     * @param from   the identifier of the initial node on the path
-     * @param to     the identifier of the final node on the path
-     * @return       the list of node identifiers from <code>from</code> to
-     *               <code>to</code> if such a path can be reconstructed from
-     *               <code>predecessor</code>; <code>null</code> otherwise
+     * @param from the identifier of the initial node on the path
+     * @param to   the identifier of the final node on the path
+     * @return the list of node identifiers from <code>from</code> to
+     *         <code>to</code> if such a path can be reconstructed from
+     *         <code>predecessor</code>; <code>null</code> otherwise
      */
     protected List<Integer> pathFromTo(int from, int to) {
         List<Integer> path = new LinkedList<>();
